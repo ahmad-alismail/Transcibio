@@ -1,0 +1,22 @@
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Streamlit cache/config (optional)
+.streamlit/config.toml
+
+# Temporary files (if you create a specific dir)
+temp_audio/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Audio files
+*.wav
+*.mp3
+*.flac
