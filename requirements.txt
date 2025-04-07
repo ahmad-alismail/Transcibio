@@ -1,6 +1,6 @@
 transformers==4.41.2
-torch==2.6.0+cu126
+torch==2.6.0
 pyannote.audio==3.3.2
-librosa==0.10.2.post1
-soundfile==0.13.0
 streamlit
+whisper
+python-dotenv
