@@ -2,5 +2,5 @@ transformers==4.41.2
 torch==2.6.0
 pyannote.audio==3.3.2
 streamlit
-whisper
+openai-whisper
 python-dotenv
