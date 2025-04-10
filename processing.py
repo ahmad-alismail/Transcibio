@@ -133,7 +133,7 @@ def align_transcription_with_diarization(
                 # Use the middle of the word time to find the speaker
                 word_mid_time = word_start + (word_end - word_start) / 2
                 speaker_label = get_speaker_for_timestamp(word_mid_time, speaker_segments)
-
+            # Aligned transcript on word level
             aligned_transcript.append({
                 "start": word_start,
                 "end": word_end,
