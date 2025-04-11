@@ -6,3 +6,7 @@ openai-whisper
 python-dotenv
 openai
 tiktoken
+pandas
+langchain 
+requests 
+streamlit-audiorecorder 

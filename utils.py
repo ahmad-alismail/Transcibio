@@ -1,7 +1,8 @@
 import streamlit as st
 import tempfile
 import os
-from typing import List, Dict, IO
+from typing import List, Dict, IO, Optional
+import wave
 
 def format_aligned_transcript(aligned_data: List[Dict]) -> List[str]:
     """Formats the aligned transcript data into readable strings."""
@@ -62,4 +63,35 @@ def save_uploaded_file(uploaded_file: IO[bytes]) -> str:
             return tmp_file.name
     except Exception as e:
         st.error(f"Error saving uploaded file: {e}")
+        return None
+    
+
+def get_transcript_text(aligned_data: List[Dict]) -> str:
+    """Concatenates words from aligned data into a single string."""
+    full_text = ""
+    if not aligned_data:
+        return ""
+    # Simple concatenation with space - handles missing 'word' key or None values
+    words = [
+        item.get('word', '').strip()
+        for item in aligned_data
+        if item.get('word') # Only include if 'word' key exists and is not empty/None
+    ]
+    full_text = " ".join(words)
+    return full_text.strip() # Remove leading/trailing spaces
+
+
+
+def save_recorded_audio_to_wav(audio_segment):
+    """Saves AudioSegment to a temporary WAV file."""
+    if not audio_segment or len(audio_segment) == 0:
+        st.error("No audio data to save")
+        return None
+    
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+            audio_segment.export(tmp_file.name, format="wav")
+            return tmp_file.name
+    except Exception as e:
+        st.error(f"Error saving recorded audio: {e}")
         return None
