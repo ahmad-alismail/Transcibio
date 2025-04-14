@@ -28,7 +28,11 @@ from utils import (
 from summarization import (
     summarize_text_map_reduce,
     LMSTUDIO_DEFAULT_URL,
-    DEFAULT_LOCAL_MODEL
+    DEFAULT_LOCAL_MODEL,
+    DEFAULT_SUMMARY_PROMPT_TEMPLATE,
+    PROTOCOL_PROMPT_TEMPLATE,
+    ORDER_PROMPT_TEMPLATE
+
 )
 
 # Disable Streamlit's file watcher to prevent PyTorch compatibility errors
@@ -77,6 +81,8 @@ num_speakers = st.sidebar.number_input(
 )
 num_speakers_param = num_speakers if num_speakers > 0 else None
 
+
+
 # --- HF Token Info ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("Hugging Face (for Diarization)")
@@ -111,6 +117,39 @@ else:
      st.sidebar.info(f"LM Studio URL: `{lmstudio_url}`")
      st.sidebar.info(f"Summarization Model: `{local_model_name_input}`")
      st.sidebar.caption("Ensure LM Studio is running with the specified model loaded and the server started.")
+
+# Choose the summary type
+st.sidebar.markdown("---")
+st.sidebar.subheader("Summary Type")
+
+summary_method = st.sidebar.selectbox(
+    "Summary Format:",
+    options=[
+        "Default Summary", 
+        "Meeting Protocol", 
+        "Order"
+    ],
+    index=0,
+    help="Choose the format for your summary."
+)
+
+# Map the selection to the actual prompt template
+summary_prompt_map = {
+    "Default Summary": DEFAULT_SUMMARY_PROMPT_TEMPLATE,
+    "Meeting Protocol": PROTOCOL_PROMPT_TEMPLATE,
+    "Order": ORDER_PROMPT_TEMPLATE
+}
+
+# Get the actual prompt template based on selection
+selected_prompt_template = summary_prompt_map[summary_method]
+
+# Show a preview of the selected format
+summary_type_description = {
+    "Default Summary": "A standard comprehensive summary of the content.",
+    "Meeting Protocol": "A structured meeting minutes format with participants, topics, decisions, and key points.",
+    "Order": "Summary of the order."
+}
+st.sidebar.caption(summary_type_description[summary_method])
 
 # Chunking controls
 st.sidebar.markdown("---")
@@ -252,11 +291,11 @@ if st.session_state.get('audio_processed'):
     if st.session_state.aligned_data:
         formatted_lines = format_aligned_transcript(st.session_state.aligned_data)
         st.markdown("\n\n".join(formatted_lines))
-        st.text_area(
-            "Full Transcript Text (for summarization input)",
-            st.session_state.full_transcript_text,
-            height=150
-        )
+        # st.text_area(
+        #     "Full Transcript Text (for summarization input)",
+        #     st.session_state.full_transcript_text,
+        #     height=150
+        # )
     else:
         st.warning("No aligned transcript data generated.")
 
@@ -266,22 +305,24 @@ if st.session_state.get('audio_processed') and lmstudio_url:
     st.markdown("---")
     st.subheader(f"✍️ Generate Summary (LM Studio: `{local_model_name_input}`) ")
 
-    if st.button(f"Generate Summary using LM Studio"):
+    if st.button(f"Generate Summary"):
         summary_display = st.empty() # Placeholder for summary output
         with summary_display.container():
             if not st.session_state.full_transcript_text:
                  st.warning("No transcript text available to summarize.")
             else:
-                with st.spinner(f"Generating summary via LM Studio... (Chunk Size: {chunk_size})"):
+                with st.spinner(f"Generating summary... (Chunk Size: {chunk_size})"):
                     start_summary_time = time.time()
+                    # In the summarization section where you call summarize_text_map_reduce
                     summary_text = summarize_text_map_reduce(
-                        full_text=st.session_state.full_transcript_text,
-                        chunk_size=chunk_size,
-                        chunk_overlap=150,
-                        base_url=lmstudio_url,
-                        model_name=local_model_name_input, # Pass the user-specified model name
-                        combine_summaries=combine_summaries # Pass the combine_summaries flag
-                    )
+                                    full_text=st.session_state.full_transcript_text,
+                                    SUMMARY_PROMPT_TEMPLATE=selected_prompt_template,  # Use the selected template
+                                    chunk_size=chunk_size,
+                                    chunk_overlap=150,
+                                    base_url=lmstudio_url,
+                                    model_name=local_model_name_input,
+                                    combine_summaries=combine_summaries
+                                    )
                     end_summary_time = time.time()
 
                     if summary_text:

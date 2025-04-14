@@ -13,6 +13,15 @@ LMSTUDIO_DEFAULT_URL = "http://localhost:1234/v1"
 DEFAULT_LOCAL_MODEL = "gemma-3-4b-it"#"deepseek-r1-distill-qwen-7b"
 DEFAULT_SUMMARY_PROMPT_TEMPLATE = "Fasse den folgenden Text zusammen. Gib ausschließlich die Zusammenfassung zurück, \
                                     ohne einleitenden oder abschließenden Kommentar:\n\n{input_text}"
+
+PROTOCOL_PROMPT_TEMPLATE = "Fasse den folgenden Text im Stil eines Protokolls zusammen. \
+                             Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar. \
+                             Konzentriere dich dabei auf die wichtigsten Punkte, Ergebnisse und Beschlüsse: {input_text}"
+
+ORDER_PROMPT_TEMPLATE = "Fasse den folgenden Text als Auftragserstellung zusammen.  \
+                                     Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar. \
+                                      Formuliere die relevanten Anforderungen und Ziele klar und präzise: {input_text}"
+
 DEFAULT_COMBINE_PROMPT_TEMPLATE = "Fasse die folgenden Zusammenfassungen zu einer abschließenden, \
                                     kohärenten Zusammenfassung des Originaltexts zusammen. Achte darauf, dass die endgültige Zusammenfassung \
                                     gut lesbar ist und die wichtigsten Informationen korrekt wiedergibt. \
@@ -72,6 +81,7 @@ def summarize_text_map_reduce(
     full_text: str,
     chunk_size: int,
     chunk_overlap: int,
+    SUMMARY_PROMPT_TEMPLATE: str,
     base_url: Optional[str] = None,
     model_name: Optional[str] = None,
     combine_summaries: bool = True  # Add this parameter
@@ -106,7 +116,7 @@ def summarize_text_map_reduce(
     progress_bar = st.progress(0, text="Summarizing chunks via local LLM...")
     for i, chunk in enumerate(chunks):
         summary = call_local_llm_summarize(
-            base_url, chunk, DEFAULT_SUMMARY_PROMPT_TEMPLATE, model_to_use
+            base_url, chunk, SUMMARY_PROMPT_TEMPLATE, model_to_use
         )
 
         if summary:
