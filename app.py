@@ -3,10 +3,11 @@ import os
 from dotenv import load_dotenv
 import time
 import tempfile
-from audiorecorder import audiorecorder # Import the recorder component
+from audiorecorder import audiorecorder 
 import io
 import warnings
 warnings.filterwarnings("ignore") # Ignore warnings for cleaner output
+
 
 # Import functions from other modules
 from processing import (
@@ -23,7 +24,7 @@ from utils import (
     format_aligned_transcript,
     save_uploaded_file,
     get_transcript_text,
-    save_recorded_audio_to_wav # Import new function
+    save_recorded_audio_to_wav, 
 )
 from summarization import (
     summarize_text_map_reduce,
@@ -331,6 +332,8 @@ if st.session_state.get('audio_processed') and lmstudio_url:
                         st.info(f"Summarization took {end_summary_time - start_summary_time:.2f} seconds.")
                     else:
                         st.error("Summarization failed. Check LM Studio status and logs.")
+
+
 
 
 # --- Footer Info ---

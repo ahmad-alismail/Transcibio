@@ -10,3 +10,5 @@ pandas
 langchain 
 requests 
 streamlit-audiorecorder 
+psutil
+GPUtil

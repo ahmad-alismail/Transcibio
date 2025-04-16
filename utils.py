@@ -3,6 +3,11 @@ import tempfile
 import os
 from typing import List, Dict, IO, Optional
 import wave
+import psutil
+import GPUtil
+import torch
+import platform
+from datetime import datetime
 
 def format_aligned_transcript(aligned_data: List[Dict]) -> List[str]:
     """Formats the aligned transcript data into readable strings."""
@@ -95,3 +100,5 @@ def save_recorded_audio_to_wav(audio_segment):
     except Exception as e:
         st.error(f"Error saving recorded audio: {e}")
         return None
+    
+
