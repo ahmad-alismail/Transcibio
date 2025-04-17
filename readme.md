@@ -68,26 +68,7 @@ Transcibio ist eine leistungsstarke Anwendung zur Audiobearbeitung, die Spracher
 
 ## Installation und Einrichtung
 
-### Option 1: Docker (empfohlen)
-
-1. **Docker-Image bauen**:
-
-```bash
-docker build -t transcibio .
-```
-
-2. **Container starten**:
-
-```bash
-docker run --rm -p 8501:8501 -e HF_TOKEN="DEIN_HF_TOKEN" --name meine-app transcibio
-```
-
-3. **Zugriff auf die App** über deinen Browser:  
-[http://localhost:8501](http://localhost:8501)
-
----
-
-### Option 2: Lokale Installation
+### Option 1: 
 
 1. **Repository klonen**:
 
@@ -126,6 +107,24 @@ LMSTUDIO_API_URL=http://localhost:1234/v1
 ```bash
 streamlit run app.py
 ```
+
+
+### Option 2: 
+
+1. **Docker-Image bauen**:
+
+```bash
+docker build -t transcibio .
+```
+
+2. **Container starten**:
+
+```bash
+docker run --rm -p 8501:8501 -e HF_TOKEN="DEIN_HF_TOKEN" --name meine-app transcibio
+```
+
+3. **Zugriff auf die App** über deinen Browser:  
+[http://localhost:8501](http://localhost:8501)
 
 ---
 
