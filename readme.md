@@ -7,8 +7,8 @@
    - [Voraussetzungen](#voraussetzungen)  
    - [Grundlegende Nutzung](#grundlegende-nutzung)  
 4. [Installation und Einrichtung](#installation-und-einrichtung)  
-   - [Option 1: Docker (empfohlen)](#option-1-docker-empfohlen)  
-   - [Option 2: Lokale Installation](#option-2-lokale-installation)  
+   - [Option 1:](#option-1)  
+   - [Option 2:](#option-2)  
 5. [Fehlerbehebung](#fehlerbehebung)
 
 ---
