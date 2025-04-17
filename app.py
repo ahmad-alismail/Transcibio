@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore") # Ignore warnings for cleaner output
 
 
 # Import functions from other modules
-from processing import (
+from src.processing import (
     load_diarization_pipeline,
     load_transcription_model,
     perform_diarization,
@@ -20,13 +20,13 @@ from processing import (
     DEFAULT_WHISPER_MODEL,
     DEFAULT_PYANNOTE_PIPELINE
 )
-from utils import (
+from src.utils import (
     format_aligned_transcript,
     save_uploaded_file,
     get_transcript_text,
     save_recorded_audio_to_wav, 
 )
-from summarization import (
+from src.summarization import (
     summarize_text_map_reduce,
     LMSTUDIO_DEFAULT_URL,
     DEFAULT_LOCAL_MODEL,

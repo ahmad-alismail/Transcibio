@@ -1,5 +1,4 @@
-# Use an official Python runtime as a parent image
-# Choose a version compatible with your dependencies (e.g., 3.10 or 3.11)
+
 FROM python:3.10-slim
 
 # Set environment variables to prevent interactive prompts during package installations
@@ -29,7 +28,6 @@ COPY requirements.txt ./
 
 # Install Python dependencies
 # --no-cache-dir: Reduces image size slightly
-# Upgrade pip first
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
