@@ -30,12 +30,7 @@ Transcibio ist eine leistungsstarke Anwendung zur Audiobearbeitung, die Spracher
 
 ## Erste Schritte
 
-### Voraussetzungen
 
-- Hugging Face API-Token (für Zugriff auf Pyannote)  
-- LM Studio (für die Zusammenfassung)
-- Python 3.11.0
-- Cuda cmpilation tools, release 12.6, V12.6.85
 
 ### Grundlegende Nutzung
 
@@ -69,7 +64,14 @@ Transcibio ist eine leistungsstarke Anwendung zur Audiobearbeitung, die Spracher
 ---
 
 ## Installation und Einrichtung
-- 
+
+### Voraussetzungen
+
+- Hugging Face API-Token (für Zugriff auf Pyannote)  
+- LM Studio (für die Zusammenfassung)
+- Python 3.11.0
+- Cuda cmpilation tools, release 12.6, V12.6.85
+
 ### Option 1: 
 
 1. **Repository klonen**:
