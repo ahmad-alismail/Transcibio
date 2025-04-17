@@ -6,11 +6,10 @@
 3. [Erste Schritte](#erste-schritte)  
    - [Voraussetzungen](#voraussetzungen)  
    - [Grundlegende Nutzung](#grundlegende-nutzung)  
-4. [Fehlerbehebung](#fehlerbehebung)  
-5. [Installation und Einrichtung](#installation-und-einrichtung)  
+4. [Installation und Einrichtung](#installation-und-einrichtung)  
    - [Option 1: Docker (empfohlen)](#option-1-docker-empfohlen)  
    - [Option 2: Lokale Installation](#option-2-lokale-installation)  
-6. [Umgebungsvariablen](#umgebungsvariablen)  
+5. [Fehlerbehebung](#fehlerbehebung)
 
 ---
 
@@ -65,8 +64,6 @@ Transcibio ist eine leistungsstarke Anwendung zur Audiobearbeitung, die Spracher
 - Bei Problemen mit der Zusammenfassung stelle sicher, dass LM Studio läuft und erreichbar ist  
 - Wenn die Audioverarbeitung langsam ist, verwende ein kleineres Whisper-Modell  
 
-Die App ist vollständig für die lokale Nutzung konzipiert, mit der optionalen Möglichkeit, LM Studio zur Generierung von Zusammenfassungen einzusetzen.
-
 ---
 
 ## Installation und Einrichtung
@@ -96,7 +93,7 @@ docker run --rm -p 8501:8501 -e HF_TOKEN="DEIN_HF_TOKEN" --name meine-app transc
 
 ```bash
 git clone https://github.com/ahmad-alismail/Transcibio.git
-cd Transcibio-1
+cd Transcibio
 ```
 
 2. **Virtuelle Umgebung erstellen und aktivieren**:
