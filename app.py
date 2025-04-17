@@ -54,7 +54,6 @@ LMSTUDIO_API_URL_ENV = st.secrets.get("LMSTUDIO_API_URL", os.getenv("LMSTUDIO_AP
 
 # --- App Title ---
 st.title("🎙️ Transcibio")
-st.markdown("Transcribe (Whisper), Diarize (Pyannote), and Summarize (Local LLM via LM Studio). Use file upload or direct recording.")
 
 # --- Session State Initialization ---
 if 'aligned_data' not in st.session_state:
@@ -87,12 +86,28 @@ num_speakers_param = num_speakers if num_speakers > 0 else None
 # --- HF Token Info ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("Hugging Face (for Diarization)")
-# (Keep HF Token display logic as before)
+
+# Check if HF_TOKEN was loaded from secrets or env
 if HF_TOKEN:
-    st.sidebar.success("✅ HF Token found.")
+    st.sidebar.success("✅ HF Token found")
 else:
-    st.sidebar.error("❌ HF Token not found.")
-    st.sidebar.info("Add `HF_TOKEN` to secrets/env for diarization.")
+    st.sidebar.error("❌ HF Token not found in secrets/env.")
+    st.sidebar.info("Please enter your Hugging Face token below to enable diarization.")
+    # Allow manual input if not found
+    hf_token_input = st.sidebar.text_input(
+        "Enter HF Token:",
+        type="password",
+        help="Your Hugging Face token is needed for Pyannote diarization model access. This token is used only for this session."
+    )
+    # Update HF_TOKEN if user provides input
+    if hf_token_input:
+        HF_TOKEN = hf_token_input.strip()
+        st.sidebar.success("✅ HF Token entered manually.")
+    else:
+        # Keep the error state if no token is entered
+        st.sidebar.warning("Diarization will be disabled without a token.")
+
+# Now, subsequent code can check HF_TOKEN again, which might have been updated by manual input
 
 # --- Summarization Config (Local LLM Only) ---
 st.sidebar.markdown("---")
@@ -114,9 +129,6 @@ local_model_name_input = st.sidebar.text_input(
 if not lmstudio_url:
      st.sidebar.warning("LM Studio URL needed for summarization.")
 else:
-     # Display the URL and Model being used
-     st.sidebar.info(f"LM Studio URL: `{lmstudio_url}`")
-     st.sidebar.info(f"Summarization Model: `{local_model_name_input}`")
      st.sidebar.caption("Ensure LM Studio is running with the specified model loaded and the server started.")
 
 # Choose the summary type
@@ -156,7 +168,7 @@ st.sidebar.caption(summary_type_description[summary_method])
 st.sidebar.markdown("---")
 st.sidebar.subheader("Detail Control (Chunking)")
 chunk_size = st.sidebar.slider(
-    "Chunk Size (chars):", min_value=500, max_value=8000, value=1500, step=100,
+    "Chunk Size (chars):", min_value=500, max_value=8000, value=4000, step=100,
     help="Size of text chunks sent to the LLM. The larger the chunk, the less detail in the summary."
 )
 # Add the toggle for final summary
@@ -336,6 +348,3 @@ if st.session_state.get('audio_processed') and lmstudio_url:
 
 
 
-# --- Footer Info ---
-st.markdown("---")
-st.markdown("App built using Streamlit, Whisper, Pyannote.audio, Langchain, and LM Studio compatible local LLMs.")

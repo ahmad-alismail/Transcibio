@@ -16,8 +16,3 @@ temp_audio/
 .DS_Store
 Thumbs.db
 
-# Audio files
-*.wav
-*.mp3
-*.flac
-readme.md
