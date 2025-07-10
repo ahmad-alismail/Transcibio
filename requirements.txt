@@ -10,5 +10,5 @@ pandas
 langchain==0.3.23
 requests 
 streamlit-audiorecorder==0.0.6
-psutil=7.0.0
+psutil==7.0.0
 GPUtil==1.4.0
