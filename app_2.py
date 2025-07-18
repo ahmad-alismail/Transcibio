@@ -62,9 +62,6 @@ if 'full_transcript_text' not in st.session_state:
     st.session_state.full_transcript_text = None
 if 'audio_processed' not in st.session_state:
      st.session_state.audio_processed = False # Flag to track if processing occurred
-# Add new session state for user consent
-if 'user_consent_given' not in st.session_state:
-    st.session_state.user_consent_given = False
 
 
 # --- Sidebar Configuration ---
@@ -203,73 +200,20 @@ if input_method == "Upload File":
         # temp_audio_path_from_input = save_uploaded_file(uploaded_file) # Moved to button logic
 
 elif input_method == "Record Audio":
-    # User consent popup for recording
-    if not st.session_state.user_consent_given:
-        st.warning("⚠️ Recording Consent Required")
-        
-        # Create a container for the consent form
-        consent_container = st.container()
-        with consent_container:
-            # Read and display consent content from consent.md
-            try:
-                with open('consent.md', 'r', encoding='utf-8') as f:
-                    consent_content = f.read()
-                st.markdown(consent_content)
-            except FileNotFoundError:
-                st.error("Consent file (consent.md) not found. Please ensure the file exists.")
-                st.stop()
-            
-            # Consent checkboxes - adapted for German consent content
-            st.markdown("---")
-            st.markdown("### Einverständniserklärung / Consent Declaration")
-            
-            research_consent = st.checkbox(
-                "Ich verstehe, dass meine Audiodaten ausschließlich zu Forschungs- und Demonstrationszwecken im Rahmen des Projekts AI Traqc verarbeitet werden."
-                )
-            
-            data_processing_consent = st.checkbox(
-                "Ich bin damit einverstanden, dass meine Audiodaten für automatische Transkription und Zusammenfassung verarbeitet werden."
-                
-            )
-            
-            
-            # Consent button
-            all_consents_given = (research_consent and data_processing_consent)
-            
-            if st.button("Einverstanden / Accept and Continue", type="primary", disabled=not all_consents_given):
-                pass
-            else:
-                if all_consents_given:
-                    st.session_state.user_consent_given = True
-                    st.rerun()
-                else:
-                    st.info("Bitte alle Einverständniserklärungen bestätigen. / Please confirm all consent declarations.")
-                    st.stop()
-    
-    # Only show recording interface if consent is given
-    if st.session_state.user_consent_given:
-        st.success("✅ Recording consent confirmed. You can now record audio.")
-        
-        # Add a button to reset consent if needed
-        if st.button("Reset Consent"):
-            st.session_state.user_consent_given = False
-            st.rerun()
-        
-        st.info("Click the microphone icon to start recording. Click again to stop.")
-        
-        # Configure the recorder - pauses on silence by default
-        audio_bytes = audiorecorder("Click to Record", "Click to Stop Recording", key="recorder")
+    st.info("Click the microphone icon to start recording. Click again to stop.")
+    # Configure the recorder - pauses on silence by default
+    audio_bytes = audiorecorder("Click to Record", "Click to Stop Recording", key="recorder")
 
-        if len(audio_bytes) > 0:  # Check if audio was recorded
-            # Convert AudioSegment to bytes that Streamlit can display
-            buf = io.BytesIO()
-            audio_bytes.export(buf, format="wav")
-            buf.seek(0)
-            
-            # Display the audio
-            st.audio(buf, format="audio/wav")
-            # Save recorded bytes temporarily when processing starts
-            # temp_audio_path_from_input = save_recorded_audio_to_wav(audio_bytes) # Moved to button logic
+    if len(audio_bytes) > 0:  # Check if audio was recorded
+        # Convert AudioSegment to bytes that Streamlit can display
+        buf = io.BytesIO()
+        audio_bytes.export(buf, format="wav")
+        buf.seek(0)
+        
+        # Display the audio
+        st.audio(buf, format="audio/wav")
+        # Save recorded bytes temporarily when processing starts
+        # temp_audio_path_from_input = save_recorded_audio_to_wav(audio_bytes) # Moved to button logic
 
 
 # --- Processing Button ---

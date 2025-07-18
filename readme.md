@@ -125,6 +125,7 @@ docker build -t transcibio .
 
 ```bash
 docker run --rm -p 8501:8501 -e HF_TOKEN="DEIN_HF_TOKEN" --name meine-app transcibio
+docker run --rm --gpus all --shm-size=16g -p 8501:8501 -e HF_TOKEN="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" --name meine-app transcibio
 ```
 
 3. **Zugriff auf die App** über deinen Browser:  
