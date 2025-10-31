@@ -1,0 +1,31 @@
+# Prompt Templates for Summarization
+# You can modify these prompts to customize the summarization behavior
+# Use {input_text} as a placeholder for the text to be summarized
+
+DEFAULT_SUMMARY_PROMPT_TEMPLATE: |
+  Fasse den folgenden Text zusammen. Gib ausschließlich die Zusammenfassung zurück, 
+  ohne einleitenden oder abschließenden Kommentar:
+  
+  {input_text}
+
+PROTOCOL_PROMPT_TEMPLATE: |
+  Fasse den folgenden Text im Stil eines Protokolls zusammen. 
+  Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar. 
+  Konzentriere dich dabei auf die wichtigsten Punkte, Ergebnisse und Beschlüsse:
+  
+  {input_text}
+
+ORDER_PROMPT_TEMPLATE: |
+  Fasse den folgenden Text als Auftragserstellung zusammen. 
+  Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar. 
+  Formuliere die relevanten Anforderungen und Ziele klar und präzise:
+  
+  {input_text}
+
+DEFAULT_COMBINE_PROMPT_TEMPLATE: |
+  Fasse die folgenden Zusammenfassungen zu einer abschließenden, 
+  kohärenten Zusammenfassung des Originaltexts zusammen. Achte darauf, dass die endgültige Zusammenfassung 
+  gut lesbar ist und die wichtigsten Informationen korrekt wiedergibt. 
+  Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar:
+  
+  {input_text}

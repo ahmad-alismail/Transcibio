@@ -3,6 +3,8 @@ import streamlit as st
 from openai import OpenAI, APIConnectionError, RateLimitError # Import specific errors
 from typing import List, Dict, Optional
 import os
+import yaml
+from pathlib import Path
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
@@ -11,22 +13,90 @@ LMSTUDIO_DEFAULT_URL = "http://localhost:1234/v1"
 # Model name might be ignored by LM Studio if only one model loaded, use a placeholder
 # Or allow user to specify which loaded model to use via app UI later if needed
 DEFAULT_LOCAL_MODEL = "gemma-3-4b-it"#"deepseek-r1-distill-qwen-7b"
-DEFAULT_SUMMARY_PROMPT_TEMPLATE = "Fasse den folgenden Text zusammen. Gib ausschließlich die Zusammenfassung zurück, \
-                                    ohne einleitenden oder abschließenden Kommentar:\n\n{input_text}"
 
-PROTOCOL_PROMPT_TEMPLATE = "Fasse den folgenden Text im Stil eines Protokolls zusammen. \
-                             Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar. \
-                             Konzentriere dich dabei auf die wichtigsten Punkte, Ergebnisse und Beschlüsse: {input_text}"
+# --- Load Prompts from External YAML File ---
+def load_prompts(config_path: str = "config/prompts.yaml") -> Dict[str, str]:
+    """Load prompt templates from external YAML file."""
+    project_root = Path(__file__).parent.parent
+    full_path = project_root / config_path
+    
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            prompts = yaml.safe_load(f)
+            if prompts is None:
+                raise ValueError(f"Prompts file at {full_path} is empty.")
+            return prompts
+    except (FileNotFoundError, yaml.YAMLError, ValueError) as e:
+        # Critical error - cannot proceed without prompts
+        st.error(f"CRITICAL: Cannot load prompts from {full_path}: {e}")
+        st.error("Please ensure config/prompts.yaml exists and is properly formatted.")
+        st.stop()  # Stop Streamlit execution
 
-ORDER_PROMPT_TEMPLATE = "Fasse den folgenden Text als Auftragserstellung zusammen.  \
-                                     Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar. \
-                                      Formuliere die relevanten Anforderungen und Ziele klar und präzise: {input_text}"
+# Load prompts at module level
+PROMPTS = load_prompts()
+DEFAULT_SUMMARY_PROMPT_TEMPLATE = PROMPTS.get("DEFAULT_SUMMARY_PROMPT_TEMPLATE", "Fasse den folgenden Text zusammen:\n\n{input_text}")
+PROTOCOL_PROMPT_TEMPLATE = PROMPTS.get("PROTOCOL_PROMPT_TEMPLATE", "Fasse den folgenden Text im Stil eines Protokolls zusammen:\n\n{input_text}")
+ORDER_PROMPT_TEMPLATE = PROMPTS.get("ORDER_PROMPT_TEMPLATE", "Fasse den folgenden Text als Auftragserstellung zusammen:\n\n{input_text}")
+DEFAULT_COMBINE_PROMPT_TEMPLATE = PROMPTS.get("DEFAULT_COMBINE_PROMPT_TEMPLATE", "Fasse die folgenden Zusammenfassungen zusammen:\n\n{input_text}")
 
-DEFAULT_COMBINE_PROMPT_TEMPLATE = "Fasse die folgenden Zusammenfassungen zu einer abschließenden, \
-                                    kohärenten Zusammenfassung des Originaltexts zusammen. Achte darauf, dass die endgültige Zusammenfassung \
-                                    gut lesbar ist und die wichtigsten Informationen korrekt wiedergibt. \
-                                    Gib ausschließlich die Zusammenfassung zurück, ohne einleitenden oder abschließenden Kommentar:\n\n{input_text}"
 
+# --- UI Component for Prompt Customization ---
+def render_prompt_editor(summary_type: str = "default") -> str:
+    """
+    Renders a prompt editor in the Streamlit UI and returns the selected/edited prompt.
+    
+    Args:
+        summary_type: Type of summary ("default", "protocol", or "order")
+    
+    Returns:
+        The prompt template to use (either default or user-edited)
+    """
+    # Map summary type to default prompts
+    prompt_defaults = {
+        "default": DEFAULT_SUMMARY_PROMPT_TEMPLATE,
+        "protocol": PROTOCOL_PROMPT_TEMPLATE,
+        "order": ORDER_PROMPT_TEMPLATE
+    }
+    
+    default_prompt = prompt_defaults.get(summary_type, DEFAULT_SUMMARY_PROMPT_TEMPLATE)
+    
+    with st.expander("⚙️ Customize Prompt (Advanced)", expanded=False):
+        st.info("💡 You can customize the prompt below. Use `{input_text}` as a placeholder for the text to be summarized.")
+        
+        # Option to use default or custom prompt
+        use_custom = st.checkbox(
+            "Use custom prompt", 
+            value=False,
+            key=f"use_custom_prompt_{summary_type}",
+            help="Check this to override the default prompt"
+        )
+        
+        if use_custom:
+            custom_prompt = st.text_area(
+                "Custom Prompt",
+                value=default_prompt,
+                height=200,
+                key=f"custom_prompt_{summary_type}",
+                help="Edit the prompt. Must include {input_text} placeholder."
+            )
+            
+            # Validate that {input_text} is present
+            if "{input_text}" not in custom_prompt:
+                st.error("⚠️ Prompt must contain the `{input_text}` placeholder!")
+                return default_prompt
+            
+            st.success("✓ Using custom prompt")
+            return custom_prompt
+        else:
+            # Show default prompt (read-only)
+            st.text_area(
+                "Default Prompt (from config/prompts.yaml)",
+                value=default_prompt,
+                height=150,
+                disabled=True,
+                key=f"default_prompt_display_{summary_type}"
+            )
+            return default_prompt
 
 
 # --- API Call Function for Local LLM (using OpenAI library) ---

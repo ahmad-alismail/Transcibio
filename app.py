@@ -30,10 +30,7 @@ from src.summarization import (
     summarize_text_map_reduce,
     LMSTUDIO_DEFAULT_URL,
     DEFAULT_LOCAL_MODEL,
-    DEFAULT_SUMMARY_PROMPT_TEMPLATE,
-    PROTOCOL_PROMPT_TEMPLATE,
-    ORDER_PROMPT_TEMPLATE
-
+    render_prompt_editor
 )
 
 # Disable Streamlit's file watcher to prevent PyTorch compatibility errors
@@ -133,39 +130,6 @@ if not lmstudio_url:
      st.sidebar.warning("LM Studio URL needed for summarization.")
 else:
      st.sidebar.caption("Ensure LM Studio is running with the specified model loaded and the server started.")
-
-# Choose the summary type
-st.sidebar.markdown("---")
-st.sidebar.subheader("Summary Type")
-
-summary_method = st.sidebar.selectbox(
-    "Summary Format:",
-    options=[
-        "Default Summary", 
-        "Meeting Protocol", 
-        "Order"
-    ],
-    index=0,
-    help="Choose the format for your summary."
-)
-
-# Map the selection to the actual prompt template
-summary_prompt_map = {
-    "Default Summary": DEFAULT_SUMMARY_PROMPT_TEMPLATE,
-    "Meeting Protocol": PROTOCOL_PROMPT_TEMPLATE,
-    "Order": ORDER_PROMPT_TEMPLATE
-}
-
-# Get the actual prompt template based on selection
-selected_prompt_template = summary_prompt_map[summary_method]
-
-# Show a preview of the selected format
-summary_type_description = {
-    "Default Summary": "A standard comprehensive summary of the content.",
-    "Meeting Protocol": "A structured meeting minutes format with participants, topics, decisions, and key points.",
-    "Order": "Summary of the order."
-}
-st.sidebar.caption(summary_type_description[summary_method])
 
 # Chunking controls
 st.sidebar.markdown("---")
@@ -373,6 +337,22 @@ if st.session_state.get('audio_processed'):
 if st.session_state.get('audio_processed') and lmstudio_url:
     st.markdown("---")
     st.subheader(f"✍️ Generate Summary (LM Studio: `{local_model_name_input}`) ")
+    
+    # Summary type selection
+    summary_type = st.selectbox(
+        "Summary Type:",
+        options=["default", "protocol", "order"],
+        format_func=lambda x: {
+            "default": "Standard Summary",
+            "protocol": "Protocol",
+            "order": "Order"
+        }[x],
+        key="summary_type_selector",
+        help="Choose the format for your summary."
+    )
+    
+    # Render the prompt editor and get the selected prompt
+    selected_prompt = render_prompt_editor(summary_type)
 
     if st.button(f"Generate Summary"):
         summary_display = st.empty() # Placeholder for summary output
@@ -382,10 +362,10 @@ if st.session_state.get('audio_processed') and lmstudio_url:
             else:
                 with st.spinner(f"Generating summary... (Chunk Size: {chunk_size})"):
                     start_summary_time = time.time()
-                    # In the summarization section where you call summarize_text_map_reduce
+                    # Use the selected/edited prompt from the editor
                     summary_text = summarize_text_map_reduce(
                                     full_text=st.session_state.full_transcript_text,
-                                    SUMMARY_PROMPT_TEMPLATE=selected_prompt_template,  # Use the selected template
+                                    SUMMARY_PROMPT_TEMPLATE=selected_prompt,  # Use custom/default prompt
                                     chunk_size=chunk_size,
                                     chunk_overlap=150,
                                     base_url=lmstudio_url,
