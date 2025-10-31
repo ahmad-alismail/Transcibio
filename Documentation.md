@@ -203,7 +203,6 @@ streamlit run app.py
 Die Anwendung sollte nun in Ihrem Webbrowser unter einer lokalen Adresse (z. B. `http://localhost:8501`) geöffnet werden.
 
 
-
 ## 6. Installation und Ausführung mit Docker (Empfohlen)
 
 Die Verwendung von Docker ist die empfohlene Methode, da sie die Einrichtung vereinfacht und sicherstellt, dass alle Systemabhängigkeiten (wie z.B. `ffmpeg`) korrekt installiert sind.
@@ -211,14 +210,35 @@ Die Verwendung von Docker ist die empfohlene Methode, da sie die Einrichtung ver
 ### Voraussetzungen
 
 *   [Docker Desktop](https://www.docker.com/products/docker-desktop/) muss installiert und gestartet sein.
-*   Das Projekt-Repository muss geklont sein (siehe Schritt 2 der lokalen Installation).
-*   Ein Hugging Face Token muss als Umgebungsvariable `HF_TOKEN` gesetzt sein, damit der Docker-Container darauf zugreifen kann.
+*   Ein Hugging Face Token muss verfügbar sein.
 
-### Build und Run
+### Methode 1: Vorgefertigtes Image von Docker Hub ausführen (Einfachste Methode)
 
-1.  **Öffnen Sie ein Terminal** im Hauptverzeichnis des Projekts.
+Da das Image öffentlich auf Docker Hub verfügbar ist, müssen Sie es nicht selbst bauen. Sie können es mit einem einzigen Befehl herunterladen und starten.
 
-2.  **Bauen Sie das Docker-Image.** Der Befehl unterscheidet sich je nach Systemarchitektur:
+1.  **Öffnen Sie ein Terminal.**
+
+2.  **Starten Sie den Container:**
+    Ersetzen Sie `DEIN_HF_TOKEN` durch Ihr persönliches Hugging Face Token.
+    ```bash
+    docker run --rm -p 8501:8501 -e HF_TOKEN="DEIN_HF_TOKEN" ahmad1289/transcibio:latest
+    ```
+    *   `docker run` lädt das Image `ahmad1289/transcibio:latest` automatisch herunter, falls es nicht lokal vorhanden ist.
+    *   `-p 8501:8501`: Leitet den Port der Anwendung auf Ihren lokalen Rechner um.
+    *   `-e HF_TOKEN="DEIN_HF_TOKEN"`: Übergibt Ihr Hugging Face Token an den Container.
+    *   `--rm`: Löscht den Container automatisch, nachdem er beendet wurde.
+
+3.  **Öffnen Sie die Anwendung** in Ihrem Browser unter `http://localhost:8501`.
+
+### Methode 2: Image lokal bauen (Für Entwickler)
+
+Wenn Sie den Code anpassen oder eine spezifische Version bauen möchten, folgen Sie diesen Schritten.
+
+1.  **Klonen Sie das Projekt-Repository** (siehe Schritt 2 der lokalen Installation).
+
+2.  **Öffnen Sie ein Terminal** im Hauptverzeichnis des Projekts.
+
+3.  **Bauen Sie das Docker-Image.** Der Befehl unterscheidet sich je nach Systemarchitektur:
     *   **Für Standard-PCs (AMD64/x86_64):**
         ```bash
         docker build --build-arg TARGETPLATFORM=linux/amd64 -t transcibio .
@@ -228,13 +248,14 @@ Die Verwendung von Docker ist die empfohlene Methode, da sie die Einrichtung ver
         docker build --build-arg TARGETPLATFORM=linux/arm64 -t transcibio .
         ```
 
-3.  **Starten Sie den Container** aus dem erstellten Image:
+4.  **Starten Sie den Container** aus dem lokal erstellten Image:
     ```bash
-    docker run -p 8501:8501 -e HF_TOKEN=$HF_TOKEN transcibio
+    docker run --rm -p 8501:8501 -e HF_TOKEN="DEIN_HF_TOKEN" transcibio
     ```
-    *   `-p 8501:8501`: Leitet den Port der Anwendung auf Ihren lokalen Rechner um.
-    *   `-e HF_TOKEN=$HF_TOKEN`: Übergibt Ihr Hugging Face Token an den Container.
 
-4.  **Öffnen Sie die Anwendung** in Ihrem Browser unter `http://localhost:8501`.
+5.  **Öffnen Sie die Anwendung** in Ihrem Browser unter `http://localhost:8501`.
 
-5.  **Konfigurieren Sie LM Studio** wie in der lokalen Installationsanleitung beschrieben. Der Docker-Container kann standardmäßig auf den `localhost` Ihres Host-Systems zugreifen, sodass die Verbindung zu LM Studio funktioniert.
+---
+**Wichtiger Hinweis für beide Methoden:**
+
+*   **Konfigurieren Sie LM Studio** wie in der lokalen Installationsanleitung beschrieben. Der Docker-Container kann standardmäßig auf den `localhost` Ihres Host-Systems zugreifen, sodass die Verbindung zu LM Studio funktioniert.
